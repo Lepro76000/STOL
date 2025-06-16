@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>STOL-youtube Raccourcisseur d'URL</title>
+  <title>STOL - Raccourcisseur d'URL</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -60,12 +60,12 @@
   </style>
 </head>
 <body>
-  <h1>STOL-youtube Raccourcisseur d'URL</h1>
+  <h1>STOL - Raccourcisseur d'URL</h1>
   <div id="error"></div>
 
   <div id="inputSection">
     <input type="text" id="urlInput" placeholder="Colle ton lien ici (ex: https://roblox.com)" />
-    <button onclick="creerRaccourci()">Créer lien STOL-youtube</button>
+    <button onclick="creerRaccourci()">Créer lien STOL</button>
   </div>
 
   <div id="result"></div>
@@ -73,13 +73,13 @@
   <script>
     // Récupère la base liens depuis localStorage ou crée un objet vide
     function getBaseLiens() {
-      const data = localStorage.getItem('baseLiens');
+      const data = localStorage.getItem('stolBaseLiens');
       return data ? JSON.parse(data) : {};
     }
 
     // Sauvegarde la base liens dans localStorage
     function setBaseLiens(obj) {
-      localStorage.setItem('baseLiens', JSON.stringify(obj));
+      localStorage.setItem('stolBaseLiens', JSON.stringify(obj));
     }
 
     // Génère un code aléatoire de 6 lettres/chiffres
@@ -135,7 +135,7 @@
       const id = params.get('id');
       if(id){
         document.getElementById('inputSection').style.display = 'none';
-        document.getElementById('error').textContent = 'Redirection en cours...';
+        document.getElementById('error').textContent = 'Redirection STOL en cours...';
         document.getElementById('result').textContent = '';
 
         const baseLiens = getBaseLiens();
@@ -146,7 +146,7 @@
             window.location.href = urlOriginal;
           }, 1000);
         } else {
-          document.getElementById('error').textContent = 'Lien raccourci inconnu.';
+          document.getElementById('error').textContent = 'Lien raccourci STOL inconnu.';
         }
       }
     }
