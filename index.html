@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>STOL-youtube Raccourcisseur d'URL</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1d1d1d;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #d32f2f;
+      margin-bottom: 20px;
+      user-select: none;
+    }
+    input[type="text"] {
+      width: 320px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #d32f2f;
+      border: none;
+      padding: 10px 25px;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+    button:hover {
+      background-color: #f44336;
+    }
+    #error {
+      color: #ff5252;
+      margin-bottom: 20px;
+      min-height: 20px;
+    }
+    #result {
+      font-size: 1.1rem;
+      background: #333;
+      padding: 15px 20px;
+      border-radius: 8px;
+      word-break: break-all;
+      max-width: 90vw;
+      text-align: center;
+      user-select: all;
+    }
+  </style>
+</head>
+<body>
+  <h1>STOL-youtube Raccourcisseur d'URL</h1>
+  <div id="error"></div>
+
+  <div id="inputSection">
+    <input type="text" id="urlInput" placeholder="Colle ton lien ici (ex: https://roblox.com)" />
+    <button onclick="creerRaccourci()">Créer lien STOL-youtube</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    // Récupère la base liens depuis localStorage ou crée un objet vide
+    function getBaseLiens() {
+      const data = localStorage.getItem('baseLiens');
+      return data ? JSON.parse(data) : {};
+    }
+
+    // Sauvegarde la base liens dans localStorage
+    function setBaseLiens(obj) {
+      localStorage.setItem('baseLiens', JSON.stringify(obj));
+    }
+
+    // Génère un code aléatoire de 6 lettres/chiffres
+    function genererCode(length=6){
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for(let i=0; i<length; i++){
+        code += chars.charAt(Math.floor(Math.random()*chars.length));
+      }
+      return code;
+    }
+
+    function creerRaccourci(){
+      const input = document.getElementById('urlInput').value.trim();
+      const errorDiv = document.getElementById('error');
+      const resultDiv = document.getElementById('result');
+      errorDiv.textContent = '';
+      resultDiv.textContent = '';
+
+      if(!input){
+        errorDiv.textContent = 'Entre une URL valide.';
+        return;
+      }
+
+      let url;
+      try{
+        url = new URL(input);
+      }catch{
+        errorDiv.textContent = 'URL invalide.';
+        return;
+      }
+
+      let baseLiens = getBaseLiens();
+
+      // Génère un id unique (pas encore utilisé)
+      let id;
+      do {
+        id = genererCode();
+      } while(baseLiens[id] !== undefined);
+
+      // Stocke la correspondance
+      baseLiens[id] = url.href;
+      setBaseLiens(baseLiens);
+
+      // Affiche le lien raccourci (avec ton domaine GitHub Pages)
+      const lienRaccourci = `${window.location.origin}${window.location.pathname}?id=${id}`;
+
+      resultDiv.innerHTML = `<a href="${lienRaccourci}" target="_blank" style="color:#f44336; font-weight:bold;">${lienRaccourci}</a>`;
+    }
+
+    function checkRedirection(){
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if(id){
+        document.getElementById('inputSection').style.display = 'none';
+        document.getElementById('error').textContent = 'Redirection en cours...';
+        document.getElementById('result').textContent = '';
+
+        const baseLiens = getBaseLiens();
+        const urlOriginal = baseLiens[id];
+        if(urlOriginal){
+          // Redirection après 1 seconde (pour afficher message)
+          setTimeout(() => {
+            window.location.href = urlOriginal;
+          }, 1000);
+        } else {
+          document.getElementById('error').textContent = 'Lien raccourci inconnu.';
+        }
+      }
+    }
+
+    checkRedirection();
+  </script>
+</body>
+</html>
